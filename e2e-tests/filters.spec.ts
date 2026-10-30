@@ -1,3 +1,4 @@
+/** End-to-end coverage for category, publisher, and combined catalog filtering. */
 import { test, expect } from '@playwright/test';
 
 test.describe('Game catalog filters', () => {

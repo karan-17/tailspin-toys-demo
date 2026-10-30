@@ -117,6 +117,9 @@ const publisherOptions = games.reduce<{ id: number; name: string }[]>((options, 
       throw new Error('Game filter controls are missing from the catalog page.');
     }
 
+    /**
+     * Applies the current category and publisher selections to the rendered game cards.
+     */
     const updateVisibleGames = (): void => {
       const selectedCategoryIds = new Set(
         categoryFilters.filter((filter) => filter.checked).map((filter) => filter.value),

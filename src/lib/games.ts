@@ -25,8 +25,11 @@ type GameSelectionRow = {
     publisherName: string | null;
 };
 
+/** Filter options for narrowing the game catalog by category and publisher. */
 export interface GameFilters {
+    /** Category IDs to match; games in any selected category are included. */
     categoryIds?: number[];
+    /** Publisher ID to match in addition to the selected categories. */
     publisherId?: number;
 }
 
@@ -61,7 +64,15 @@ export async function getAllGames(db: Database): Promise<Game[]> {
     return rows.map(mapGame);
 }
 
-/** Games matching any selected category and, when provided, the selected publisher. */
+/**
+ * Returns games matching any selected category and, when provided, the selected publisher.
+ *
+ * Results are ordered by title. An empty category list is treated as no category filter.
+ *
+ * @param db - Injectable Drizzle database client.
+ * @param filters - Optional category and publisher filters.
+ * @returns Matching games with their category and publisher details.
+ */
 export async function getGamesByFilters(
     db: Database,
     filters: GameFilters,

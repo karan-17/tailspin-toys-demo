@@ -38,6 +38,12 @@ async function seedGames(db: Database, count: number): Promise<void> {
     }
 }
 
+/**
+ * Seeds a minimal catalog with two categories and two publishers for filter tests.
+ *
+ * @param db - In-memory database to seed.
+ * @returns IDs for the seeded categories and publishers.
+ */
 async function seedFilterGames(db: Database): Promise<FilterFixtureIds> {
     const [strategy] = await db
         .insert(categories)
