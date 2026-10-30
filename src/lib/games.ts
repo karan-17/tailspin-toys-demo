@@ -1,4 +1,4 @@
-import { eq, asc } from 'drizzle-orm';
+import { eq, asc, and, inArray } from 'drizzle-orm';
 import type { Database } from './db';
 import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
@@ -24,6 +24,14 @@ type GameSelectionRow = {
     publisherId: number | null;
     publisherName: string | null;
 };
+
+/** Filter options for narrowing the game catalog by category and publisher. */
+export interface GameFilters {
+    /** Category IDs to match; games in any selected category are included. */
+    categoryIds?: number[];
+    /** Publisher ID to match in addition to the selected categories. */
+    publisherId?: number;
+}
 
 function mapGame(row: GameSelectionRow): Game {
     return {
@@ -53,6 +61,34 @@ function baseGamesQuery(db: Database) {
 /** All games ordered by title. */
 export async function getAllGames(db: Database): Promise<Game[]> {
     const rows = await baseGamesQuery(db).orderBy(asc(games.title));
+    return rows.map(mapGame);
+}
+
+/**
+ * Returns games matching any selected category and, when provided, the selected publisher.
+ *
+ * Results are ordered by title. An empty category list is treated as no category filter.
+ *
+ * @param db - Injectable Drizzle database client.
+ * @param filters - Optional category and publisher filters.
+ * @returns Matching games with their category and publisher details.
+ */
+export async function getGamesByFilters(
+    db: Database,
+    filters: GameFilters,
+): Promise<Game[]> {
+    const conditions = [];
+    if (filters.categoryIds && filters.categoryIds.length > 0) {
+        conditions.push(inArray(games.categoryId, filters.categoryIds));
+    }
+    if (filters.publisherId !== undefined) {
+        conditions.push(eq(games.publisherId, filters.publisherId));
+    }
+
+    const query = baseGamesQuery(db);
+    const rows = conditions.length > 0
+        ? await query.where(and(...conditions)).orderBy(asc(games.title))
+        : await query.orderBy(asc(games.title));
     return rows.map(mapGame);
 }
 

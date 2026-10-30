@@ -42,6 +42,10 @@ npm run build      # prebuild migrates + seeds, then builds the static site
 npm run preview
 ```
 
+## Find games
+
+On the home page, select one or more categories and optionally choose a publisher to narrow the catalog. A game matches any selected category, while a selected publisher is combined with the category selection. Filters run in the browser against the statically rendered catalog, so they work without a backend request.
+
 ## Database
 
 The SQLite database is built from `db/games.csv` — there is no live data to migrate.
